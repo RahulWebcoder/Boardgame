@@ -1,53 +1,175 @@
-# BoardgameListingWebApp
 
-## Description 
+# Boardgame Application – GitOps CI/CD on AWS EKS
 
-**Board Game Database Full-Stack Web Application.**
-This web application displays lists of board games and their reviews. While anyone can view the board game lists and reviews, they are required to log in to add/ edit the board games and their reviews. The 'users' have the authority to add board games to the list and add reviews, and the 'managers' have the authority to edit/ delete the reviews on top of the authorities of users.  
+This repository contains a Java-based Boardgame application with a **complete end-to-end CI/CD pipeline** implemented using **GitHub Actions, Amazon EKS, Amazon ECR, and Argo CD (GitOps)**.
 
-## Technologies
+The project demonstrates **production-style DevOps practices**, including secure authentication via **OIDC**, automated quality gates, containerization, and pull-based deployments.
 
-- Java
-- Spring Boot
-- Amazon Web Services(AWS) EC2
-- Thymeleaf
-- Thymeleaf Fragments
-- HTML5
-- CSS
-- JavaScript
-- Spring MVC
-- JDBC
-- H2 Database Engine (In-memory)
-- JUnit test framework
-- Spring Security
-- Twitter Bootstrap
-- Maven
+---
 
-## Features
+## 🔹 Application Credit
 
-- Full-Stack Application
-- UI components created with Thymeleaf and styled with Twitter Bootstrap
-- Authentication and authorization using Spring Security
-  - Authentication by allowing the users to authenticate with a username and password
-  - Authorization by granting different permissions based on the roles (non-members, users, and managers)
-- Different roles (non-members, users, and managers) with varying levels of permissions
-  - Non-members only can see the boardgame lists and reviews
-  - Users can add board games and write reviews
-  - Managers can edit and delete the reviews
-- Deployed the application on AWS EC2
-- JUnit test framework for unit testing
-- Spring MVC best practices to segregate views, controllers, and database packages
-- JDBC for database connectivity and interaction
-- CRUD (Create, Read, Update, Delete) operations for managing data in the database
-- Schema.sql file to customize the schema and input initial data
-- Thymeleaf Fragments to reduce redundancy of repeating HTML elements (head, footer, navigation)
+> **Original Application Source:**  
+> https://github.com/jaiswaladi246/Boardgame  
+>  
+> The application code is authored by the original repository owner.  
+> This fork focuses on **DevOps, CI/CD, and GitOps implementation**, not application feature development.
 
-## How to Run
+---
 
-1. Clone the repository
-2. Open the project in your IDE of choice
-3. Run the application
-4. To use initial user data, use the following credentials.
-  - username: bugs    |     password: bunny (user role)
-  - username: daffy   |     password: duck  (manager role)
-5. You can also sign-up as a new user and customize your role to play with the application! 😊
+## 🏗️ Architecture Overview
+Developer
+↓
+GitHub (Application Repo)
+↓
+GitHub Actions (CI)
+
+Build & Test (Maven)
+
+Code Quality (SonarCloud)
+
+Docker Build
+
+Push Image → Amazon ECR (OIDC)
+
+Update GitOps Repo
+↓
+GitHub (GitOps Repo)
+↓
+Argo CD (CD - Pull Based)
+↓
+Amazon EKS (Kubernetes)
+
+
+
+---
+
+## 🚀 Technologies Used
+
+- **Language:** Java 17
+- **Build Tool:** Maven
+- **CI:** GitHub Actions
+- **Code Quality:** SonarCloud
+- **Containerization:** Docker
+- **Registry:** Amazon ECR
+- **Kubernetes:** Amazon EKS
+- **CD / GitOps:** Argo CD
+- **Cloud Provider:** AWS
+- **Security:** GitHub OIDC (No long-lived AWS keys)
+
+---
+
+## 🔐 Security Highlights
+
+- No AWS access keys stored in GitHub
+- GitHub Actions authenticates to AWS using **OIDC**
+- CI has **no direct cluster access**
+- Kubernetes deployments are **pull-based** via Argo CD
+- Git is the **single source of truth**
+
+---
+
+## ⚙️ CI Pipeline Details (GitHub Actions)
+
+The CI pipeline runs on every push to `main` and performs:
+
+1. Checkout code with full Git history
+2. Setup Java 17 environment
+3. Build and test application using Maven
+4. Perform static code analysis using SonarCloud
+5. Build Docker image
+6. Push Docker image to Amazon ECR (tagged with commit SHA)
+7. Update GitOps repository with the new image tag
+
+### Key CI Configuration
+- Uses **GitHub-hosted runners**
+- Uses **OIDC** to assume AWS IAM role
+- Image tags are immutable (commit SHA)
+
+---
+
+## 🔁 CD & GitOps (Argo CD)
+
+- Argo CD is installed inside the EKS cluster
+- Argo CD continuously monitors a **separate GitOps repository**
+- Any change to Kubernetes manifests triggers deployment
+- Auto-sync, self-heal, and prune are enabled
+
+### GitOps Principles Followed
+- No `kubectl apply` from CI
+- No manual deployments
+- Rollbacks are performed via Git revert
+- Configuration drift is automatically corrected
+
+---
+
+## 🧪 Scenarios Implemented & Tested
+
+- **Automated deployment on image update**
+- **Configuration drift detection & self-healing**
+- **Rollback using Git revert**
+- **Manual vs Auto Sync control**
+- **Secure image pull from ECR**
+
+---
+
+## 📂 Repository Structure
+
+├── .github/workflows/
+│ └── ci.yml # CI pipeline
+├── Dockerfile
+├── pom.xml
+├── src/
+└── README.md
+
+
+
+> Kubernetes manifests are maintained in a **separate GitOps repository**.
+
+---
+
+## 🛠️ Environment Setup Summary
+
+### AWS
+- Amazon EKS cluster with managed node group
+- Amazon ECR repository for container images
+- IAM role configured with OIDC trust for GitHub Actions
+- Worker node IAM role with ECR read permissions
+
+### GitHub
+- Application repository (this repo)
+- GitOps repository for Kubernetes manifests
+- GitHub Actions secrets:
+  - `SONAR_TOKEN`
+  - `GITOPS_TOKEN`
+
+---
+
+## 📌 Key Learnings & Outcomes
+
+- Built a **secure, production-style GitOps CI/CD pipeline**
+- Implemented **pull-based CD** using Argo CD
+- Eliminated long-lived credentials using **OIDC**
+- Improved deployment reliability and auditability
+- Gained hands-on experience with real-world DevOps patterns
+
+---
+
+## 👤 Author
+
+**Rahul Patel**  
+DevOps / Cloud Engineer  
+GitHub: https://github.com/RahulWebcoder
+
+---
+
+## 📄 License
+
+This project follows the same license as the original application repository.
+
+
+
+
+
+
+
