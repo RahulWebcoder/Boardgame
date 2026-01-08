@@ -56,5 +56,21 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
+      - name: Update GitOps repo with new image tag
+        env:
+          GITOPS_REPO: RahulWebcoder/boardgame-gitops
+          IMAGE_TAG: ${{ github.sha }}
+          ECR_IMAGE: 820198200129.dkr.ecr.us-east-1.amazonaws.com/boardgame
+          TOKEN: ${{ secrets.GITOPS_TOKEN }}
+        run: |
+          git clone https://$TOKEN@github.com/$GITOPS_REPO.git
+          cd boardgame-gitops
+          sed -i "s|image: .*|image: $ECR_IMAGE:$IMAGE_TAG|" manifests/deployment.yaml
+          git config user.email "ci@github.com"
+          git config user.name "github-actions"
+          git commit -am "deploy: update image to $IMAGE_TAG"
+          git push
+
+
 
 
